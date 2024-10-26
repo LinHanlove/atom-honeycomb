@@ -6,9 +6,35 @@ import { useEffect, useRef, useState } from "react"
 
 import Modal from "~components/modal"
 import Progress from "~components/progress"
-import { Compressor_PNG, formatFileSize, UPNG_PNG } from "~utils"
+import {
+  Compressor_PNG,
+  convertImageFormat,
+  formatFileSize,
+  UPNG_PNG
+} from "~utils"
 
 export default function CompressHero() {
+  /**
+   * @constant adjustList
+   * @description 压缩率
+   */
+  const adjustList = [
+    { value: null, label: "仅转换" },
+    { value: 0.8, label: "轻度" },
+    { value: 0.6, label: "一般" },
+    { value: 0.4, label: "重度" }
+  ]
+
+  /**
+   * @constant formatType
+   * @description 格式转换
+   */
+  const formatTypeList = [
+    { value: "png", label: "PNG" },
+    { value: "webp", label: "WEBP" },
+    { value: "jpeg", label: "JPEG" }
+  ]
+
   /**
    * @useState quality
    * @description 选择的压缩率
@@ -16,14 +42,10 @@ export default function CompressHero() {
   const [quality, setQuality] = useState<number>(0.6)
 
   /**
-   * @constant adjustList
-   * @description 压缩率
+   * @useState quality
+   * @description 选择的压缩率
    */
-  const adjustList = [
-    { value: 0.8, label: "轻度" },
-    { value: 0.6, label: "一般" },
-    { value: 0.4, label: "重度" }
-  ]
+  const [formatType, setFormatType] = useState<string>("png")
 
   /**
    * @useState fileList
@@ -41,9 +63,14 @@ export default function CompressHero() {
   const [isDragging, setIsDragging] = useState(false)
 
   /**
-   * @useState isOpen
+   * @useState isOpen preview
    */
   const [isOpen, setIsOpen] = useState(false)
+
+  /**
+   * @useState isOpen format
+   */
+  const [isOpenFormat, setIsOpenFormat] = useState(false)
 
   /**
    * @useState compressor details
@@ -68,6 +95,16 @@ export default function CompressHero() {
   })
 
   /**
+   * @useState formatImage
+   */
+  const [formatImage, setFormatImage] = useState<File>()
+
+  /**
+   * @useState errorText
+   */
+  const [errorText, setErrorText] = useState<string>()
+
+  /**
    * @description 监听文件列表
    */
   useEffect(() => {
@@ -84,12 +121,16 @@ export default function CompressHero() {
       for (const file of fileList) {
         let fileData
         if (file.status !== "success" && file.type.startsWith("image/")) {
-          if (file.type === "image/png") {
-            fileData = await UPNG_PNG(file, quality)
+          if (quality === null) {
+            fileData = file
           } else {
-            console.log(await Compressor_PNG(file, quality))
+            if (file.type === "image/png") {
+              fileData = await UPNG_PNG(file, quality)
+            } else {
+              console.log(await Compressor_PNG(file, quality))
 
-            fileData = await Compressor_PNG(file, quality)
+              fileData = await Compressor_PNG(file, quality)
+            }
           }
           console.log("压缩前--->", file)
 
@@ -120,8 +161,6 @@ export default function CompressHero() {
    */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     Array.from(e.target.files).forEach((file) => {
-      console.log("--------------", file, file.type.startsWith("image/"))
-
       file["id"] = file.type.startsWith("image/")
         ? file.name.split(".")[0] + "-" + new Date().getTime()
         : null
@@ -177,6 +216,25 @@ export default function CompressHero() {
   }
 
   /**
+   * @function handleConvertImageFormat
+   * @description 转换图片格式
+   * @param file 文件
+   */
+  const handleConvertImageFormat = async () => {
+    if (formatImage.type.split("/")[1] === formatType)
+      return setErrorText("格式相同，无需转换")
+    const res = await convertImageFormat({
+      file: formatImage,
+      format: formatType
+    })
+    const a = document.createElement("a")
+    a.href = URL.createObjectURL(res)
+    a.download = res.name
+    a.click()
+    setIsOpenFormat(false)
+  }
+
+  /**
    * @function handleCancel
    * @description 取消
    */
@@ -213,7 +271,7 @@ export default function CompressHero() {
       </h2>
       <div className="subTitle mx-4  text-[12px] font-semibold flex ">
         <div className="mb-1 ">
-          智能有损压缩，支持PNG、JPEG、GIF、WEBP等格式
+          支持PNG、JPEG、GIF、WEBP图片进行智能有损压缩、预览、格式转换；如只转换格式，则请勾选仅转换
         </div>
         <div className="mx-2">|</div>
         <div className="mb-1 text-[orange]">
@@ -246,7 +304,6 @@ export default function CompressHero() {
             })}
           </div>
         </div>
-
         {/* E 调节区 */}
 
         {/* S 上传区 */}
@@ -289,12 +346,17 @@ export default function CompressHero() {
                 {item.id ? (
                   <Progress
                     beforeText={formatFileSize(item.size)}
-                    afterText={formatFileSize(
-                      compressorDetails.find((i) => i.id === item.id)?.size
-                    )}
+                    afterText={
+                      quality !== null &&
+                      formatFileSize(
+                        compressorDetails.find((i) => i.id === item.id)?.size
+                      )
+                    }
                     progress={
-                      compressorDetails.find((i) => i.id === item.id)
-                        ?.compressibility
+                      quality !== null
+                        ? compressorDetails.find((i) => i.id === item.id)
+                            ?.compressibility
+                        : null
                     }
                   />
                 ) : (
@@ -307,6 +369,7 @@ export default function CompressHero() {
               </div>
               {item.id && (
                 <div className="h-full w-auto flex items-end justify-center gap-2 ml-2">
+                  {/* S 预览 */}
                   <div
                     onClick={() => handlePreview(item)}
                     className="h-full group flex items-end justify-center mr-2">
@@ -315,6 +378,9 @@ export default function CompressHero() {
                       className="w-[20px] h-[20px] rounded-full  text-green-500 group-hover:bg-[#f5f5f5] group-hover:scale-150 transition-all duration-300"
                     />
                   </div>
+                  {/* E 预览 */}
+
+                  {/* S 删除 */}
                   <div
                     onClick={() => handleDelete(item)}
                     className="h-full group flex items-end  justify-center mr-2">
@@ -323,6 +389,9 @@ export default function CompressHero() {
                       className="w-[20px] h-[20px] rounded-full  text-red-500 group-hover:bg-[#f5f5f5] group-hover:scale-150 transition-all duration-300"
                     />
                   </div>
+                  {/* S 删除 */}
+
+                  {/* S 下载 */}
                   <div
                     onClick={() => handleDownload(item)}
                     className="h-full group flex items-end  justify-center mr-2">
@@ -331,6 +400,21 @@ export default function CompressHero() {
                       className="w-[20px] h-[20px] rounded-full  text-[orange] group-hover:bg-[#f5f5f5] group-hover:scale-150 transition-all duration-300"
                     />
                   </div>
+                  {/* S 下载 */}
+
+                  {/* S 格式转换 */}
+                  <div
+                    onClick={() => {
+                      setFormatImage(item)
+                      setIsOpenFormat(true)
+                    }}
+                    className="h-full group flex items-end  justify-center mr-2">
+                    <Icon
+                      icon="icon-park-outline:file-conversion-one"
+                      className="w-[20px] h-[20px] rounded-full  text-[#2d9cf4] group-hover:bg-[#f5f5f5] group-hover:scale-150 transition-all duration-300"
+                    />
+                  </div>
+                  {/* E 格式转换 */}
                 </div>
               )}
             </div>
@@ -339,7 +423,7 @@ export default function CompressHero() {
         {/* S 展示区 */}
       </div>
 
-      {/* S 弹窗 */}
+      {/* S 预览弹窗 */}
       <Modal
         isOpen={isOpen}
         setIsOpen={(fisOpen) => setIsOpen(fisOpen)}
@@ -375,7 +459,53 @@ export default function CompressHero() {
           </div>
         </div>
       </Modal>
-      {/* E 弹窗 */}
+      {/* E 预览弹窗 */}
+
+      {/* S format弹窗 */}
+      <Modal
+        isOpen={isOpenFormat}
+        setIsOpen={(isOpenFormat) => setIsOpenFormat(isOpenFormat)}
+        hasConfirm
+        confirmText="下载"
+        onConfirm={handleConvertImageFormat}
+        onCancel={handleCancel}
+        title="格式转换">
+        <div className="w-[50vw] flex justify-center items-center flex-col">
+          <div className=" text-[#666] text-[14px] font-semibold mb-3 flex items-center">
+            <span> 转换前</span>
+            <span className="text-red-500 ">({formatImage?.type})</span>
+            <Icon
+              icon="eos-icons:arrow-rotate"
+              className=" text-[orange] w-[20px] h-[20px] mx-4"
+            />
+            <span>转换为</span>
+            <span className="text-green-500">(imgae/{formatType})</span>
+          </div>
+          <p className="text-[#666] text-[14px] font-semibold mb-3">
+            {errorText}
+          </p>
+          <div className="flex justify-start mt-5">
+            <div className="flex items-center mb-4 bg-[#f5f5f5] p-1 rounded-lg">
+              {formatTypeList.map((item, idx) => {
+                return (
+                  <div
+                    style={{
+                      backgroundColor:
+                        item.value === formatType ? "orange" : "#f5f5f5"
+                    }}
+                    onClick={() => setFormatType(item.value)}
+                    className={`${idx === formatTypeList.length - 1 ? "" : "mr-2"} w-[60px] h-[26px] flex items-center justify-center rounded-lg  cursor-pointer hover:bg-[#e0e0e0] transition-all`}
+                    key={item.value}>
+                    <div className="flex items-center ">{item.label}</div>
+                  </div>
+                )
+              })}
+            </div>
+            {/* E 调节区 */}
+          </div>
+        </div>
+      </Modal>
+      {/* E format弹窗 */}
     </>
   )
 }

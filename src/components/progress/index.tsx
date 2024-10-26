@@ -29,7 +29,7 @@ export default function Progress(option) {
             </div>
           ) : (
             <div className="progress-before  text-[10px] text-[#000] z-20">
-              已经很小啦！试试重度压缩
+              {progress !== null ? "已经很小啦！试试重度压缩" : ""}
             </div>
           )
         ) : null}

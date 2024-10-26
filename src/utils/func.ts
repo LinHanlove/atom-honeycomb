@@ -51,7 +51,6 @@ export const windowRefresh = (window: Window, chrome: any) => {
     message: "网页已刷新🥳",
     chrome
   })
-
 }
 
 /**
@@ -392,4 +391,69 @@ export const formatFileSize = (size: number): string => {
   } else if (size < 1024 * 1024 * 1024) {
     return (size / 1024 / 1024).toFixed(2) + "MB"
   }
+}
+
+/**
+ * @function convertImageFormat
+ * @description 将图片转换为需要的格式
+ * @param file 要转换的文件
+ * @param quality 压缩质量
+ * @param callback 回调函数
+ */
+export const convertImageFormat = (option): Promise<File> => {
+  const { file, quality = 1, format } = option
+  return new Promise((resolve, reject) => {
+    // 使用FileReader读取文件内容
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      // 将读取到的数据URL转换为Image对象
+      const img = new Image()
+      img.onload = async () => {
+        // 创建canvas并设置宽高为图片的宽高
+        const canvas = document.createElement("canvas")
+        const ctx = canvas.getContext("2d")
+        canvas.width = img.width
+        canvas.height = img.height
+
+        // 将图片绘制到canvas上
+        ctx.drawImage(img, 0, 0)
+
+        // 将canvas上的图片转换为指定格式的DataURL
+        const formatImage = canvas.toDataURL(`image/${format}`, quality)
+        // DataURL转换为File对象
+        const blob = await dataURLtoBlob(formatImage)
+        // Blob对象转换为File对象
+        const fileObj = new File(
+          [blob],
+          file.name.split(".")[0] + `.${format}`,
+          { type: blob.type }
+        )
+        resolve(fileObj)
+      }
+      img.src = e.target.result as string
+    }
+    reader.onerror = (e) => {
+      console.error("Error reading file", e)
+      reject(e)
+    }
+    reader.readAsDataURL(file) // 读取文件内容并转换为DataURL
+  })
+}
+
+/**
+ * @function dataURLtoBlob
+ * @description 将数据URL转换为Blob对象
+ * @param {string} dataurl 数据URL字符串
+ * @returns {Promise<Blob>} Blob对象
+ */
+export const dataURLtoBlob = (dataurl) => {
+  const arr = dataurl.split(",")
+  const mime = arr[0].match(/:(.*?);/)[1]
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new Blob([u8arr], { type: mime })
 }

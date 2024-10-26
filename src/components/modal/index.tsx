@@ -9,7 +9,9 @@ export default function Modal({
   title,
   setIsOpen,
   hasConfirm = false,
-  hasCancel = false
+  hasCancel = false,
+  confirmText = "Confirm",
+  cancelText = "Cancel"
 }) {
   return (
     <>
@@ -36,14 +38,14 @@ export default function Modal({
                     <button
                       className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                       onClick={() => onCancel()}>
-                      取消
+                      {cancelText}
                     </button>
                   )}
                   {hasConfirm && (
                     <button
                       className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                       onClick={() => onConfirm()}>
-                      确定
+                      {confirmText}
                     </button>
                   )}
                 </div>
