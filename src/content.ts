@@ -7,7 +7,7 @@ import {
   Log,
   windowRefresh
 } from "~utils"
-import areaScreenshot from "~utils/ability/areaScreenshot"
+import areaScreenshot from "~utils/ability/AreaScreenshot"
 
 import "~/assets/style/cropper.css"
 
