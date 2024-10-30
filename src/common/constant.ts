@@ -68,11 +68,6 @@ export const defaultSetting = [
     suffix: "&lang=en2zh"
   },
   {
-    alias: "fsshow",
-    prefix: "https://fshows.yuque.com/search?q=",
-    suffix: "&type=content&scope=%2F&tab=related&p=1&sence=modal"
-  },
-  {
     alias: "csdn",
     prefix: "https://so.csdn.net/so/search?spm=1000.2115.3001.4498&q=",
     suffix: "&t=&u="
