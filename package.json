@@ -1,7 +1,7 @@
 {
   "name": "Atom Honeycomb",
   "displayName": "Atom Honeycomb",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Develop more efficient and aesthetically pleasing browser plugins",
   "author": "LinHan",
   "scripts": {
