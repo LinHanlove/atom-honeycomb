@@ -1,11 +1,16 @@
-import { clearAllCookie, log, sleep } from "atom-tools"
+import { clearAllCookie, log, sleep } from "atom-tools";
 
-import { safePages } from "~common"
-import { Message } from "~components/message"
-import Compressor from "~utils/ability/Compressor"
-import UPNG from "~utils/ability/UPNG"
 
-import { notify, sendMessage, sendMessageRuntime } from "./common"
+
+import { safePages } from "~common";
+import { Message } from "~components/message";
+import Compressor from "~utils/ability/Compressor";
+import UPNG from "~utils/ability/UPNG";
+
+
+
+import { notify, sendMessage, sendMessageRuntime } from "./common";
+
 
 /**
  * @function 打开githubDev 线上查看github项目
@@ -341,7 +346,9 @@ export const blobToFile = (blob, extraData) => {
 export const UPNG_PNG = async (file: File, quality: number): Promise<File> => {
   const arrayBuffer = await file.arrayBuffer()
   const decoded = UPNG.decode(arrayBuffer)
+  console.log(decoded,'decoded');
   const rgba8 = UPNG.toRGBA8(decoded)
+  log.info("UPNG压缩--->")
 
   // 这里 保持宽高不变，保持80%的质量（接近于 tinypng 的压缩效果）
   const compressed = UPNG.encode(
@@ -361,20 +368,21 @@ export const UPNG_PNG = async (file: File, quality: number): Promise<File> => {
  */
 export const Compressor_PNG = async (
   file: File,
-  quality: number
+  quality: number,
+  window
 ): Promise<File> => {
   return new Promise((resolve, reject) => {
     console.log(file, quality)
-
-    new Compressor(file, {
-      quality,
-      success(result) {
-        resolve(result)
-      },
-      error(err) {
-        reject(err)
-      }
-    })
+    log.info("Compressor压缩--->")
+     new Compressor(file, {
+       quality,
+       success(result) {
+         resolve(result)
+       },
+       error(err) {
+         reject(err)
+       }
+     })
   })
 }
 

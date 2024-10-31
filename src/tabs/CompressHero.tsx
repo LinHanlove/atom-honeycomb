@@ -110,50 +110,53 @@ export default function CompressHero() {
   useEffect(() => {
     if (!fileList.length) {
       setCompressorDetails([])
-      return
+    } else {
+      processFiles()
     }
+  }, [fileList])
 
+  /***
+   * @function processFiles
+   */
+  const processFiles = async () => {
     const afterData = []
+    console.log("监听文件列表", fileList, quality)
 
-    const processFiles = async () => {
-      console.log(fileList)
+    for (let index = 0; index < fileList.length; index++) {
+      let fileData
+      const file = fileList[index]
 
-      for (const file of fileList) {
-        let fileData
-        if (file.status !== "success" && file.type.startsWith("image/")) {
-          if (quality === null) {
-            fileData = file
+      if (file.status !== "success" && file.type.startsWith("image/")) {
+        if (quality) {
+          console.log("文件类型--->", file.type, file.type === "image/png")
+
+          if (file.type === "image/png") {
+            fileData = await UPNG_PNG(file, quality)
           } else {
-            if (file.type === "image/png") {
-              fileData = await UPNG_PNG(file, quality)
-            } else {
-              console.log(await Compressor_PNG(file, quality))
-
-              fileData = await Compressor_PNG(file, quality)
-            }
+            fileData = await Compressor_PNG(file, quality, window)
           }
-          console.log("压缩前--->", file)
-
-          console.log("压缩后-->", fileData)
-          file["status"] = "success"
-          const compressibility =
-            ((file.size - fileData.size) / file.size) * 100
-          afterData.push({
-            id: file.id,
-            file: fileData,
-            name: file.name,
-            size: fileData.size,
-            type: file.type,
-            compressibility
-          })
         }
-      }
+        console.log("压缩前--->", file)
 
-      setCompressorDetails([...afterData, ...compressorDetails])
+        console.log("压缩后-->", fileData)
+        file["status"] = "success"
+        const compressibility = quality
+          ? ((file.size - fileData.size) / file.size) * 100
+          : 0
+        afterData.push({
+          id: file.id,
+          file: quality ? fileData : file,
+          name: file.name,
+          size: quality ? fileData.size : file.size,
+          type: file.type,
+          key: quality ? "compress" : "convert", // 标记是否是压缩文件还是转换文件
+          compressibility
+        })
+      }
     }
 
-    processFiles()
-  }, [fileList, quality])
+    setCompressorDetails([...afterData, ...compressorDetails])
+  }
 
   /**
    * @function handleFileChange
@@ -264,6 +267,12 @@ export default function CompressHero() {
     }
   }, [])
 
+  /**
+   * @function isConvert
+   */
+  const isConvert = (file) => {
+    return compressorDetails.find((i) => i.id === file.id)?.key === "convert"
+  }
   return (
     <>
       <h2 className="title text-center text-2xl font-bold py-4">
@@ -347,13 +356,17 @@ export default function CompressHero() {
                   <Progress
                     beforeText={formatFileSize(item.size)}
                     afterText={
-                      quality !== null &&
-                      formatFileSize(
-                        compressorDetails.find((i) => i.id === item.id)?.size
-                      )
+                      compressorDetails.find((i) => i.id === item.id)?.key ===
+                      "compress"
+                        ? formatFileSize(
+                            compressorDetails.find((i) => i.id === item.id)
+                              ?.size
+                          )
+                        : ""
                     }
                     progress={
-                      quality !== null
+                      compressorDetails.find((i) => i.id === item.id)?.key ===
+                      "compress"
                         ? compressorDetails.find((i) => i.id === item.id)
                             ?.compressibility
                         : null
@@ -370,14 +383,17 @@ export default function CompressHero() {
               {item.id && (
                 <div className="h-full w-auto flex items-end justify-center gap-2 ml-2">
                   {/* S 预览 */}
-                  <div
-                    onClick={() => handlePreview(item)}
-                    className="h-full group flex items-end justify-center mr-2">
-                    <Icon
-                      icon="ri:eye-line"
-                      className="w-[20px] h-[20px] rounded-full  text-green-500 group-hover:bg-[#f5f5f5] group-hover:scale-150 transition-all duration-300"
-                    />
-                  </div>
+                  {!isConvert(item) && (
+                    <div
+                      onClick={() => handlePreview(item)}
+                      className="h-full group flex items-end justify-center mr-2">
+                      <Icon
+                        icon="ri:eye-line"
+                        className="w-[20px] h-[20px] rounded-full  text-green-500 group-hover:bg-[#f5f5f5] group-hover:scale-150 transition-all duration-300"
+                      />
+                    </div>
+                  )}
+
                   {/* E 预览 */}
 
                   {/* S 删除 */}
@@ -403,17 +419,20 @@ export default function CompressHero() {
                   {/* S 下载 */}
 
                   {/* S 格式转换 */}
-                  <div
-                    onClick={() => {
-                      setFormatImage(item)
-                      setIsOpenFormat(true)
-                    }}
-                    className="h-full group flex items-end  justify-center mr-2">
-                    <Icon
-                      icon="icon-park-outline:file-conversion-one"
-                      className="w-[20px] h-[20px] rounded-full  text-[#2d9cf4] group-hover:bg-[#f5f5f5] group-hover:scale-150 transition-all duration-300"
-                    />
-                  </div>
+                  {isConvert(item) && (
+                    <div
+                      onClick={() => {
+                        setFormatImage(item)
+                        setIsOpenFormat(true)
+                      }}
+                      className="h-full group flex items-end  justify-center mr-2">
+                      <Icon
+                        icon="icon-park-outline:file-conversion-one"
+                        className="w-[20px] h-[20px] rounded-full  text-[#2d9cf4] group-hover:bg-[#f5f5f5] group-hover:scale-150 transition-all duration-300"
+                      />
+                    </div>
+                  )}
+
                   {/* E 格式转换 */}
                 </div>
               )}

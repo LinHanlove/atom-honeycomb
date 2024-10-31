@@ -1,3 +1,15 @@
+/*!
+ * Compressor.js v1.2.1
+ * https://fengyuanchen.github.io/compressorjs
+ *
+ * Copyright 2018-present Chen Fengyuan
+ * Released under the MIT license
+ *
+ * Date: 2023-02-28T14:09:41.732Z
+ */
+
+'use strict';
+
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
   if (Object.getOwnPropertySymbols) {
@@ -1042,4 +1054,4 @@ var Compressor = /*#__PURE__*/function () {
   return Compressor;
 }();
 
-export { Compressor as default };
+module.exports = Compressor;
