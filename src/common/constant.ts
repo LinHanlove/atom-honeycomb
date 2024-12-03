@@ -58,16 +58,6 @@ export const defaultSetting = [
     suffix: ""
   },
   {
-    alias: "汉译英",
-    prefix: "https://fanyi.baidu.com/mtpe-individual/multimodal?query=",
-    suffix: "&lang=zh2en"
-  },
-  {
-    alias: "英译汉",
-    prefix: "https://fanyi.baidu.com/mtpe-individual/multimodal?query=",
-    suffix: "&lang=en2zh"
-  },
-  {
     alias: "csdn",
     prefix: "https://so.csdn.net/so/search?spm=1000.2115.3001.4498&q=",
     suffix: "&t=&u="

@@ -146,10 +146,13 @@ const Content = () => {
     if (setting.find((item: any) => item.alias === alias)) {
       notify({
         message: "别名已存在",
+        timeout: 1500,
         chrome
       }).then(() => {
         setSetModel("false")
       })
+
+      return
     }
 
     setSetting([...setting, newSetting])
@@ -353,18 +356,23 @@ const Content = () => {
                   className="col-span-1 group flex justify-center items-center flex-col ">
                   {/* 点击搜索 */}
                   <button
-                    className={`atom-button--small ${searchTarget === idx.toString() && "active"} !shrink-0`}
+                    className={`atom-button--small ${
+                      searchTarget === idx.toString() && "active"
+                    } !shrink-0`}
                     type="button"
                     title="搜索预设"
                     onClick={() => onSetSearchTarget(idx.toString())}>
-                    <Icon 
+                    <Icon
                       icon={randomIcon()}
                       className=" text-[orange] w-[20px] h-[20px] "
                     />
                   </button>
                   {/* 点击搜索 */}
                   <p
-                    className={`w-full text-center mt-1 ${searchTarget === idx.toString() && "text-[orange] font-bold"} group-hover:text-[orange] `}>
+                    className={`w-full text-center mt-1 ${
+                      searchTarget === idx.toString() &&
+                      "text-[orange] font-bold"
+                    } group-hover:text-[orange] `}>
                     {item.alias}
                   </p>
                 </div>
