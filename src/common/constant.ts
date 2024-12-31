@@ -91,7 +91,7 @@ export const defaultSetting = [
     alias: "antdR",
     prefix: "https://ant.design/components/",
     suffix: "-cn"
-  },
+  }
 ]
 
 /**
@@ -136,6 +136,16 @@ export const menuList = [
       return createTab({
         chrome,
         url: "CompressHero"
+      })
+    }
+  },
+  {
+    id: "TableMarkdown",
+    title: "TableMarkdown",
+    onclick: function () {
+      return createTab({
+        chrome,
+        url: "TableMarkdown"
       })
     }
   },

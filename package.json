@@ -12,6 +12,8 @@
   "dependencies": {
     "@plasmohq/messaging": "^0.6.2",
     "@reduxjs/toolkit": "^2.2.7",
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-react": "^1.0.6",
     "atom-tools": "^0.5.91",
     "cropperjs": "^1.6.2",
     "plasmo": "0.89.3",
@@ -73,13 +75,13 @@
         },
         "description": "图片压缩"
       },
-      "areaScreenshot": {
+      "TableMarkdown": {
         "suggested_key": {
-          "default": "Alt+A",
-          "mac": "Alt+A",
-          "windows": "Alt+A"
+          "default": "Alt+T",
+          "mac": "Alt+T",
+          "windows": "Alt+T"
         },
-        "description": "区域截图"
+        "description": "md表格格式转换"
       }
     }
   }
