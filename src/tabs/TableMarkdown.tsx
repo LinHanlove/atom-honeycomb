@@ -121,7 +121,7 @@ export default function TableMarkdown() {
 
     console.log("格式化后的数据", formatData(data))
 
-    setData(JSON.stringify(formatData(data)))
+    setData(JSON.stringify({ TableMarkdown: formatData(data) }))
   }
 
   /**
@@ -137,23 +137,27 @@ export default function TableMarkdown() {
       if (item.type === "List") {
         const list = []
         let j = i + 1
-        while (j < data.length && data[j].key.startsWith("└")) {
-          processedIndices.add(j) // 标记为已处理
-          const cloneData = {
-            ...data[j],
-            key: data[j].key.replace(/^└\s*/, "")
+        if (!data[j].key.startsWith("└")) {
+          result.push(item)
+        } else {
+          while (j < data.length && data[j].key.startsWith("└")) {
+            processedIndices.add(j) // 标记为已处理
+            const cloneData = {
+              ...data[j],
+              key: data[j].key.replace(/^└\s*/, "")
+            }
+            list.push(cloneData)
+            j++
           }
-          list.push(cloneData)
-          j++
+          if (list.length > 0) {
+            // 将提取的列表项添加到结果中
+            result.push({
+              [item.key]: list
+            })
+          }
+          // 跳过已处理的项
+          i = j - 1 // 注意这里的调整，确保 i 指向下一个未处理的项
         }
-        if (list.length > 0) {
-          // 将提取的列表项添加到结果中
-          result.push({
-            [item.key]: list
-          })
-        }
-        // 跳过已处理的项
-        i = j - 1 // 注意这里的调整，确保 i 指向下一个未处理的项
       } else if (!processedIndices.has(i)) {
         // 只添加未处理的项
         result.push(item)
