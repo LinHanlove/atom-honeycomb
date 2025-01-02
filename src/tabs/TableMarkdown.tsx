@@ -149,7 +149,15 @@ export default function TableMarkdown() {
             list.push(cloneData)
             j++
           }
+
+          // 检查是否有嵌套的List结构
           if (list.length > 0) {
+            // 递归处理嵌套的List
+            const nestedList = formatData(list)
+            result.push({
+              [item.key]: nestedList
+            })
+          } else {
             // 将提取的列表项添加到结果中
             result.push({
               [item.key]: list
