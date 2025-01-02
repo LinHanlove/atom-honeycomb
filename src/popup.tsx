@@ -90,7 +90,7 @@ const Content = () => {
         })
     },
     {
-      title: "compressHero",
+      title: "CompressHero",
       icon: "pajamas:doc-compressed",
       iconColor: "orange",
       event: () =>
@@ -100,10 +100,20 @@ const Content = () => {
         })
     },
     {
-      title: "githubDev",
+      title: "GithubDev",
       icon: "line-md:github-loop",
       iconColor: "",
       event: () => openGitHubDev()
+    },
+    {
+      title: "TableMarkdown",
+      icon: "material-symbols:markdown",
+      iconColor: "",
+      event: () =>
+        createTab({
+          chrome,
+          url: "TableMarkdown"
+        })
     },
     {
       title: "刷新",
