@@ -1,19 +1,17 @@
 import { menuList } from "~common"
-import {
-  createTab,
-  lightIcon,
-  Log,
-  openCapture,
-  openGitHubDev,
-} from "~utils"
+import { createTab, lightIcon, Log, openCapture, openGitHubDev } from "~utils"
 
 /**
  * @function 监听快捷键命令
  */
 chrome.commands.onCommand.addListener((command) => {
   Log(`Command "${command}" triggered-bg`)
-  // 区域截图
-  if (command === "areaScreenshot") openCapture(chrome)
+  // md表格格式转换
+  if (command === "tableMarkdown")
+    createTab({
+      chrome,
+      url: "TableMarkdown"
+    })
   // jsonFormatter
   if (command === "jsonFormatter")
     createTab({

@@ -1,7 +1,7 @@
 {
   "name": "Atom Honeycomb",
   "displayName": "Atom Honeycomb",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Develop more efficient and aesthetically pleasing browser plugins",
   "author": "LinHan",
   "scripts": {
@@ -75,7 +75,7 @@
         },
         "description": "图片压缩"
       },
-      "TableMarkdown": {
+      "tableMarkdown": {
         "suggested_key": {
           "default": "Alt+T",
           "mac": "Alt+T",
