@@ -97,19 +97,13 @@ export default function TableMarkdown() {
     setHtml(editor.getHtml())
     const parser = new DOMParser()
     const doc = parser.parseFromString(editor.getHtml(), "text/html")
-    console.log("解析后的数据", doc)
 
     // 获取表格行
     const rows = doc.querySelectorAll("table tbody tr")
 
-    console.log("获取表格行", rows)
-
     // 提取表格数据并转换为对象数组
     const data = Array.from(rows).map((row) => {
-      console.log("提取表格数据并转换为对象数组--->", row)
-
       const cells = row.querySelectorAll("td")
-      console.log("提取表格数据并转换为对象数组", cells[0]?.innerText?.trim())
 
       return {
         key: cells[0]?.innerText?.trim(),
@@ -119,31 +113,40 @@ export default function TableMarkdown() {
       }
     })
 
-    console.log("格式化后的数据", formatData(data))
+    console.log("原数据", data)
 
     setData(JSON.stringify({ TableMarkdown: formatData(data) }))
   }
 
   /**
    * @function 格式化数组
-   * 遇到type为List格式的，则当前key为数组，继续向下遍历，遇到key为└开头的，则当前key为数组中的元素 直到遇到下一个List或不是└开头的结束
+   * 遇到type为List格式的，则当前key为数组，继续向下遍历，遇到key为└开头的，则当前key为数组中的元素
+   * 直到遇到下一个List或不是└开头的结束
    */
   const formatData = (data) => {
     const result = []
     const processedIndices = new Set() // 用于记录已处理的索引
+
     // 英文的正则
     const notEnglish = /[\u4e00-\u9fa5]/g
+
+    // 移除第一个元素如果它是一个非英文描述
     if (data[0] && data[0].type.match(notEnglish)) {
-      data.splice(0, 1)
+      data.shift() // 使用shift而不是splice，因为它不会修改原数组
     }
+
     for (let i = 0; i < data.length; i++) {
       const item = data[i]
-      if (item.type === "List") {
+
+      if (["List", "list", "Array", "array", "[]"].includes(item.type)) {
         const list = []
         let j = i + 1
-        if (!data[j].key.startsWith("└")) {
+
+        // 如果下一个元素不是以└开头，直接添加当前项
+        if (!data[j] || !data[j].key.startsWith("└")) {
           result.push(item)
         } else {
+          // 处理以└开头的元素
           while (j < data.length && data[j].key.startsWith("└")) {
             processedIndices.add(j) // 标记为已处理
             const cloneData = {
@@ -158,6 +161,9 @@ export default function TableMarkdown() {
           if (list.length > 0) {
             // 递归处理嵌套的List
             const nestedList = formatData(list)
+            nestedList.unshift({
+              id: "List"
+            })
             result.push({
               [item.key]: nestedList
             })
@@ -170,9 +176,41 @@ export default function TableMarkdown() {
           // 跳过已处理的项
           i = j - 1 // 注意这里的调整，确保 i 指向下一个未处理的项
         }
-      } else if (!processedIndices.has(i)) {
+      } else if (["Object", "object", "obj"].includes(item.type)) {
+        const obj = {}
+        let j = i + 1
+
+        // 如果下一个元素不是以└开头，直接添加当前项
+        if (!data[j] || !data[j].key.startsWith("└")) {
+          result.push(item)
+        } else {
+          // 处理以└开头的元素
+          while (j < data.length && data[j].key.startsWith("└")) {
+            processedIndices.add(j) // 标记为已处理
+            const cloneData = {
+              ...data[j],
+              key: data[j].key.replace(/^└\s*/, "")
+            }
+            obj[cloneData.key] = cloneData
+            j++
+          }
+          console.log("嵌套对象---->", obj)
+
+          const nestedObj = formatData(Object.values(obj))
+          nestedObj.unshift({
+            id: "Object"
+          })
+          result.push({
+            [item.key]: nestedObj
+          })
+          // 跳过已处理的项
+          i = j - 1 // 注意这里的调整，确保 i 指向下一个未处理的项
+        }
+      } else {
         // 只添加未处理的项
-        result.push(item)
+        if (!processedIndices.has(i)) {
+          result.push(item)
+        }
       }
     }
     return result
