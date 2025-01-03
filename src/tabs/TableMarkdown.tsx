@@ -131,7 +131,11 @@ export default function TableMarkdown() {
   const formatData = (data) => {
     const result = []
     const processedIndices = new Set() // 用于记录已处理的索引
-
+    // 英文的正则
+    const notEnglish = /[\u4e00-\u9fa5]/g
+    if (data[0] && data[0].type.match(notEnglish)) {
+      data.splice(0, 1)
+    }
     for (let i = 0; i < data.length; i++) {
       const item = data[i]
       if (item.type === "List") {
