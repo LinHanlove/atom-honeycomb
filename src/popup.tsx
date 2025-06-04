@@ -297,108 +297,29 @@ const Content = () => {
       <header className="text-center text-[18px] text-[#000] font-bold  py-2 border-b-[1px] border-[orange]">
         Atom Honeycomb
       </header>
-      {/* S 快捷输入框 */}
-      <div className="px-2 pb-3 mt-2">
-        <p className="text-[#000] text-[14px] font-medium mb-2">快捷搜索</p>
-        <div className="w-full  flex justify-between items-center ">
-          <Input
-            id="searchInput"
-            onInput={(e) => setSearch(e)}
-            placeholder="输入关键字"
-            width={340}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                onSearch()
-              }
-            }}
-          />
-          <div>
-            <button
-              className="atom-button--small"
-              type="button"
-              title="Search"
-              onClick={onSearch}>
-              <Icon
-                icon="ion-md-search"
-                className="w-[20px] h-[20px] text-[#00c983] "
-              />
-            </button>
-          </div>
+      {/* S 新版本提示 */}
+      <div className="fixed inset-0 flex justify-center items-center bg-gray-50 bg-opacity-95 z-[9999] p-8 backdrop-blur-sm">
+        <div className="bg-white p-12 rounded-xl shadow-xl border border-gray-100 text-center max-w-sm w-full transition-all duration-200 hover:shadow-2xl">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            重要通知：版本升级！
+          </h2>
+          <p className="text-gray-700 text-[17px] leading-relaxed mb-5">
+            Atom Honeycomb 已全面升级为{" "}
+            <span className="font-semibold text-orange-700">horizon-hop</span>
+            ，带来全新体验！
+          </p>
+          <p className="text-gray-600 text-[15px] mb-10 italic">
+            为确保最佳体验，安装新版本后请及时卸载旧的 Atom Honeycomb 插件。
+          </p>
+          <a
+            href="https://example.com/new-atom-honeycomb"
+            target="_blank"
+            className="inline-block bg-orange-600 text-white font-semibold py-3 px-10 rounded-lg shadow-md no-underline hover:bg-orange-700 hover:shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50">
+            立即前往下载
+          </a>
         </div>
       </div>
-      {/* E 快捷输入框 */}
-
-      {/* S 功能区 */}
-      <div className="menu h-[180px] px-3 border-t-[1px] border-r-[1px] border-[#f4f7f6] flex justify-between  pt-3 gap-2 overflow-y-auto">
-        <div className="w-[150px] h-0  gap-y-2 grid grid-cols-2 items-start  ">
-          {menuList.map((item, index) => {
-            return (
-              <div
-                key={index}
-                className="col-span-1 group flex justify-center items-center flex-col text-nowrap ">
-                {/* 点击截图 */}
-                <button
-                  className="atom-button--small !shrink-0"
-                  type="button"
-                  title={item.title}
-                  onClick={item.event}>
-                  <Icon
-                    style={{ color: item.iconColor }}
-                    icon={item.icon}
-                    className="w-[20px] h-[20px] "
-                  />
-                </button>
-                {/* 点击截图 */}
-                <div className="mt-1 group-hover:text-[orange]">
-                  {item.title}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        <div className="flex-1  h-0 gap-y-2 grid grid-cols-4 items-start pl-2 ">
-          {setting.length > 0 &&
-            setting.map((item, idx) => {
-              return (
-                <div
-                  key={idx}
-                  className="col-span-1 group flex justify-center items-center flex-col ">
-                  {/* 点击搜索 */}
-                  <button
-                    className={`atom-button--small ${
-                      searchTarget === idx.toString() && "active"
-                    } !shrink-0`}
-                    type="button"
-                    title="搜索预设"
-                    onClick={() => onSetSearchTarget(idx.toString())}>
-                    <Icon
-                      icon={randomIcon()}
-                      className=" text-[orange] w-[20px] h-[20px] "
-                    />
-                  </button>
-                  {/* 点击搜索 */}
-                  <p
-                    className={`w-full text-center mt-1 ${
-                      searchTarget === idx.toString() &&
-                      "text-[orange] font-bold"
-                    } group-hover:text-[orange] `}>
-                    {item.alias}
-                  </p>
-                </div>
-              )
-            })}
-        </div>
-      </div>
-      {/* E 功能区 */}
-
-      {/* S 介绍 */}
-      <div
-        className="fixed  bottom-[10px] right-[10px] text-[12px] text-[#818999] cursor-pointer"
-        onClick={() => openIntroduce(chrome)}>
-        关于 <span className="text-[orange] ">Atom Honeycomb</span>
-      </div>
-      {/* E 介绍 */}
+      {/* E 新版本提示 */}
 
       {/* S 设置模态框 */}
       {showModel === "true" && (
