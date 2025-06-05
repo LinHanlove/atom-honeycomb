@@ -312,7 +312,7 @@ const Content = () => {
             为确保最佳体验，安装新版本后请及时卸载旧的 Atom Honeycomb 插件。
           </p>
           <a
-            href="https://example.com/new-atom-honeycomb"
+            href="https://chromewebstore.google.com/detail/horizon-hop/hhflcijdccomhfgeipdbghjbenbbljaa?hl=zh-CN&utm_source=ext_sidebar"
             target="_blank"
             className="inline-block bg-orange-600 text-white font-semibold py-3 px-10 rounded-lg shadow-md no-underline hover:bg-orange-700 hover:shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50">
             立即前往下载
